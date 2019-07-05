@@ -1,5 +1,6 @@
 package com.spring.template.layer.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.library.collection.DataRow;
 import com.spring.template.abstracts.AbstractJdbcDao;
 import com.spring.template.dto.User;
+import com.spring.template.util.Db;
 
 @Repository
 public class UserDaoJdbcImpl extends AbstractJdbcDao 
@@ -16,14 +18,14 @@ public class UserDaoJdbcImpl extends AbstractJdbcDao
 	public User findOneById(long id) {
 		try {
 			super.newObject();
-			super.sql.append("SELECT * FROM account_user WHERE ID=?");
+			super.sql.append("SELECT * FROM account_user WHERE id=?");
 			super.params.add(id);
 			DataRow row = super.executeDataRow();
 			User user = new User();
-			user.setId(row.getLong("id"));
-			user.setUsername(row.getString("username"));
-			user.setFirstName(row.getString("firstname"));
-			user.setLastName(row.getString("lastname"));
+			user.setId(row.getLong(Db.Columns.Fields.id));
+			user.setUsername(row.getString(Db.Columns.Fields.username));
+			user.setFirstName(row.getString(Db.Columns.Fields.firstname));
+			user.setLastName(row.getString(Db.Columns.Fields.lastname));
 			return user;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -45,20 +47,56 @@ public class UserDaoJdbcImpl extends AbstractJdbcDao
 
 	@Override
 	public List<User> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			super.newObject();
+			super.sql.append("SELECT * FROM account_user ORDER BY 1");
+			List<User> list = new ArrayList<User>();
+			super.executeDataRows()
+				.forEach(row -> {
+					User user = new User();
+					user.setId(row.getLong(Db.Columns.Fields.id));
+					user.setUsername(row.getString(Db.Columns.Fields.username));
+					user.setFirstName(row.getString(Db.Columns.Fields.firstname));
+					user.setLastName(row.getString(Db.Columns.Fields.lastname));
+					list.add(user);
+				});
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ArrayList<User>();
+		}
 	}
 
 	@Override
 	public boolean create(User entity) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			super.newObject();
+			super.sql.append("INSERT INTO account_user(id, username, firstname, lastname) VALUES(?,?,?,?)");
+			super.params.add(entity.getId());
+			super.params.add(entity.getUsername());
+			super.params.add(entity.getFirstName());
+			super.params.add(entity.getLastName());
+			return super.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
 	public boolean update(User entity) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			super.newObject();
+			super.sql.append("UPDATE account_user SET firstname=?, lastname=? WHERE username=? OR id=?");
+			super.params.add(entity.getFirstName());
+			super.params.add(entity.getLastName());
+			super.params.add(entity.getUsername());
+			super.params.add(entity.getId());
+			return super.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
@@ -69,8 +107,15 @@ public class UserDaoJdbcImpl extends AbstractJdbcDao
 
 	@Override
 	public boolean delete(User entity) {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			super.newObject();
+			super.sql.append("DELETE FROM account_user WHERE id=?");
+			super.params.add(entity.getId());
+			return super.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
