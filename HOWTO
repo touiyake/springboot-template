@@ -1,0 +1,4 @@
+Install Jar to Local Repository
+
+cd <jar path>
+mvn install:install-file -Dfile=<jar file name> -DgroupId=com.ecash.library -DartifactId=codinglabs-common -Dversion=1.1.12 -Dpackaging=jar
